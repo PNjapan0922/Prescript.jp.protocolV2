@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE INDEX - MISSION CONTROL</title>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: 'DotGothic16', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .logo {
+            width: 220px;
+            margin-bottom: 40px;
+            pointer-events: none;
+            filter: drop-shadow(0 0 15px rgba(135, 206, 235, 0.8));
+        }
+
+        #display-text {
+            font-size: 2.2rem;
+            text-align: center;
+            max-width: 85%;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            text-shadow: 
+                0 0 10px rgba(135, 206, 235, 1),
+                0 0 20px rgba(135, 206, 235, 0.8);
+        }
+
+        @media (max-width: 600px) {
+            #display-text { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body onclick="handleAction()">
+
+    <audio id="click-sound" src="index_message_1.wav"></audio>
+
+    <img src="The_Index_Logo.png" alt="Logo" class="logo">
+    <div id="display-text">指令を開始する。</div>
+
+    <script>
+        const displayText = document.getElementById('display-text');
+        const clickSound = document.getElementById('click-sound');
+        let isProcessing = false;
+        let step = 1;
+
+        // AIによって拡張された指令データベース
+        const missions = [
+            "利き手ではない方の手のみで食事を摂れ。\n期限：次の食事終了まで",
+            "1時間、一切の「電子機器」への接触を断て。\n期限：1時間後まで",
+            "自身の最も恥ずかしい過去を誰か一人に告白せよ。\n期限：本日中",
+            "語尾に「であります」をつけて全ての会話を行え。\n期限：明日の起床まで",
+            "鏡に向かって自分の長所を3つ大声で述べよ。\n期限：5分以内",
+            "スクワットを合計50回完遂せよ。\n期限：15分以内",
+            "今日から3日間、エスカレーターとエレベーターの使用を禁ずる。\n期限：72時間",
+            "連絡先の5番目の人物に「いつも感謝しています」と送信せよ。\n期限：10分以内",
+            "10分間、何があっても真顔を維持せよ。\n期限：即時開始",
+            "今の服装のまま、全力でスクワット10回を実行せよ。\n期限：3分以内",
+            "本日の残り時間、全ての「カタカナ語」の使用を禁ずる。\n期限：本日24時まで",
+            "コンビニで一番高い飲み物を購入し、一気に飲み干せ。\n期限：1時間以内",
+            "今すぐ腕立て伏せを限界回数まで行い、記録を報告せよ。\n期限：5分以内",
+            "12時間、SNS（X, Instagram等）へのログインを一切禁ずる。\n期限：12時間後",
+            "身近な誰かに、コーヒーまたは茶を奢れ。\n期限：今日が終わるまで",
+            "部屋の四隅をすべて掃除し、塵一つ残すな。\n期限：30分以内",
+            "次の外出時、左右異なる靴下を履いて過ごせ。\n期限：帰宅まで",
+            "本日の夕食は「白米のみ」とせよ。おかずは許されない。\n期限：次の食事",
+            "30分間、誰とも口を利いてはならない。\n期限：30分間",
+            "今から1時間、一切の「座る」「寝る」を禁じ、立ち続けろ。\n期限：1時間"
+        ];
+
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789■□@#$%&*+!?";
+
+        function handleAction() {
+            if (isProcessing) return;
+
+            if (step === 1) {
+                if(clickSound) {
+                    clickSound.currentTime = 0;
+                    clickSound.play().catch(e => console.log("Audio play blocked"));
+                }
+                
+                isProcessing = true;
+                startAdvancedTyper();
+            } else {
+                location.reload();
+            }
+        }
+
+        function startAdvancedTyper() {
+            const mission = missions[Math.floor(Math.random() * missions.length)];
+            let iteration = 0;
+            
+            const timer = setInterval(() => {
+                displayText.innerText = mission
+                    .split("")
+                    .map((char, index) => {
+                        if (index < Math.floor(iteration)) {
+                            return mission[index];
+                        }
+                        if (char === "\n") return "\n";
+                        return chars[Math.floor(Math.random() * chars.length)];
+                    })
+                    .join("");
+
+                if (iteration >= mission.length) {
+                    clearInterval(timer);
+                    isProcessing = false;
+                    step = 2;
+                }
+
+                // 速度調整（1/3ずつ進む = 1文字確定するのに約3フレーム）
+                iteration += 0.4; 
+            }, 40);
+        }
+    </script>
+</body>
+</html>
